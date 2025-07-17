@@ -19,9 +19,14 @@ class RatesViewModel: ObservableObject {
             let (data, _) = try await URLSession.shared.data(from: url)
             let response = try JSONDecoder().decode(ExchangeRateResponse.self, from: data)
             self.currencyRates = response.conversion_rates
+            #if DEBUG
             print("currency rates fetched!")
+            #endif
         } catch {
+            #if DEBUG
             print("Error: \(error)")
+            #endif
+            
         }
     }
     
@@ -53,7 +58,6 @@ struct ConversorView: View {
     }
     
     var foreignToMyCurrency: Decimal {
-        print("\(totalEnteredAmount) / \(viewModel.currencyRate ?? 1)")
         return Decimal(totalEnteredAmount) / (viewModel.currencyRate ?? 1)
     }
     
@@ -78,7 +82,6 @@ struct ConversorView: View {
                     }
                 }
                 .onChange(of: selectedCurrency) {
-                    print("you want to tranform \(selectedCurrency.code) to \(myCurrency.code)")
                     selectedCurrencyCode = selectedCurrency.code
                     Task {
                         viewModel.findCurrencyRate(for: selectedCurrency.code)
